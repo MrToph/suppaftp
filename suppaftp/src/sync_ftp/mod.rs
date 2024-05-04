@@ -499,8 +499,10 @@ where
     /// Finalize put when using stream
     /// This method must be called once the file has been written and
     /// `put_with_stream` has been used to write the file
-    pub fn finalize_put_stream(&mut self, stream: impl Write) -> FtpResult<()> {
+    pub fn finalize_put_stream(&mut self, mut stream: impl Write) -> FtpResult<()> {
         debug!("Finalizing put stream");
+
+        stream.flush().map_err(FtpError::ConnectionError)?;
         // Drop stream NOTE: must be done first, otherwise server won't return any response
         drop(stream);
         trace!("Stream dropped");
